@@ -2,12 +2,35 @@
 {% import "bootstrap_wtf.html" as wtf %}
 
 {% block content %}
-<h1>Private Account Page</h1>
-
-<p>Hello {{ current_user.username }}</p>
-
-<p>This page is only available to you as the currently logged in user</p>
-
-<p>The email address we have recorded for you is: {{ current_user.email }}</p>
-
+<div class="container mt-4">
+    <h1 class="mb-4">Account Information</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Basic Information</h5>
+            <p><strong>Username:</strong> {{ current_user.username }}</p>
+            <p><strong>Email:</strong> {{ current_user.email }}</p>
+            <p><strong>Type:</strong> {{ current_user.type }}</p>
+            
+            {% if current_user.type == 'student' %}
+            <h5 class="card-title mt-4">Student Information</h5>
+            <p><strong>Student ID:</strong> {{ current_user.student_id }}</p>
+            <p><strong>Course:</strong> {{ current_user.course }}</p>
+            <p><strong>Year of Study:</strong> {{ current_user.year_of_study }}</p>
+            {% endif %}
+            
+            {% if current_user.type == 'counsellor' %}
+            <h5 class="card-title mt-4">Counsellor Information</h5>
+            <p><strong>Specialization:</strong> {{ current_user.specialization }}</p>
+            <p><strong>Availability:</strong> {{ current_user.availability }}</p>
+            {% endif %}
+            
+            {% if current_user.type == 'wellbeing_staff' %}
+            <h5 class="card-title mt-4">Wellbeing Staff Information</h5>
+            <p><strong>Department:</strong> {{ current_user.department }}</p>
+            <p><strong>Role:</strong> {{ current_user.role }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endblock %}

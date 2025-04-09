@@ -1,5 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Welcome</h1>
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="jumbotron text-center bg-light p-5 rounded">
+        <h1 class="display-4">Welcome to UniSupport</h1>
+        <p class="lead">Your Centralized Platform for Mental Health Support</p>
+        {% if not current_user.is_authenticated %}
+        <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Get Started</a>
+        {% endif %}
+    </div>
+
+    <!-- Features Section -->
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-robot fa-3x mb-3 text-primary"></i>
+                    <h3 class="card-title">AI-Powered Support</h3>
+                    <p class="card-text">Get real-time AI assistance to locate appropriate university services and receive personalized guidance.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-check fa-3x mb-3 text-primary"></i>
+                    <h3 class="card-title">Easy Appointment Management</h3>
+                    <p class="card-text">Self-refer for university counselling services and manage your appointments all in one place.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x mb-3 text-primary"></i>
+                    <h3 class="card-title">Wellbeing Tracker</h3>
+                    <p class="card-text">Track your moods and symptoms over time with AI-generated insights and personalized guidance.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title text-center mb-4">About UniSupport</h2>
+                    <p class="card-text">
+                        UniSupport is designed to streamline access to mental health support through a centralized,
+                        user-friendly platform. The application provides students with real-time AI assistance to
+                        locate appropriate services offered by the university, and also allows students to self-refer for
+                        university counselling services and manage appointments. In addition, the Wellbeing Tracker
+                        allows users to track their moods and symptoms over time, and utilizes AI to generate
+                        personalized insights and guidance tailored to an individual's needs.
+                    </p>
+                    <p class="card-text">
+                        By addressing the inefficiencies of current university support structures, UniSupport has the potential to
+                        enhance student well-being, improve academic performance, and create a more supportive
+                        university experience for all.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    {% if not current_user.is_authenticated %}
+    <div class="row mt-5">
+        <div class="col-12 text-center">
+            <h3>Ready to Get Started?</h3>
+            <p class="lead">Join UniSupport today and take control of your mental wellbeing.</p>
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">Login Now</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}
