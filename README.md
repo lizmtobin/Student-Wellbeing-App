@@ -12,3 +12,4 @@ A short one-line description of what the project does.
 ## Contributors
 
 - Liz
+- Alex
