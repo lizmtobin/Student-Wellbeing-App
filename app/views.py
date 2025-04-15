@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, send_file, send_from_directory
 from app import app
 from app.models import User, Student, Counsellor, WellbeingStaff
-from app.forms import ChooseForm, LoginForm
+from app.forms import ChooseForm, LoginForm, ReferralForm
 from flask_login import current_user, login_user, logout_user, login_required, fresh_login_required
 import sqlalchemy as sa
 from app import db
@@ -69,6 +69,13 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
+@app.route('/referral_form', methods=['GET', 'POST'])
+def referral_form():
+    form = ReferralForm()
+    if form.validate_on_submit():
+        flash(f'Counselling Self Referral Successfully Submitted')
+        return redirect(url_for('home'))
+    return render_template('referral_form.html', title='Counselling Self-Referral Form', form=form)
 
 # Debug route to reset database - go to the url /debug/reset-db to reset the database
 @app.route('/debug/reset-db')

@@ -1,8 +1,6 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import SubmitField, HiddenField, StringField, BooleanField, SelectField, PasswordField
-from wtforms.fields.numeric import IntegerField
-from wtforms.fields.simple import TextAreaField
+from wtforms import SubmitField, HiddenField, StringField, BooleanField, SelectField, PasswordField, IntegerField, TextAreaField
 from wtforms.validators import DataRequired, NumberRange, ValidationError, Email, Optional, Length
 from app import db
 from app.models import User
@@ -23,3 +21,11 @@ class LoginForm(FlaskForm):
     ], validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+class ReferralForm(FlaskForm):
+    referral_name = StringField('Name', validators=[DataRequired()])
+    referral_id = StringField('Student ID', validators=[DataRequired()])
+    referral_details = TextAreaField('Please summarise your reasons for accessing the University Counselling '
+                                     'service and any issues you need support with:', validators=[DataRequired()])
+    submit = SubmitField('Submit self-referral')
+
