@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Critical Wellbeing Alerts{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>🚨 Wellbeing Alerts</h2>
+
+  {% if alerts %}
+    <ul class="list-group">
+      {% for alert in alerts %}
+        <li class="list-group-item list-group-item-danger">
+          <strong>Student ID:</strong> {{ alert.user_id }}<br>
+          <strong>Date:</strong> {{ alert.date_logged.strftime('%Y-%m-%d %H:%M') }}<br>
+          <strong>Mood:</strong> {{ alert.mood }}<br>
+          <strong>Symptoms:</strong> {{ alert.symptoms }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No critical alerts at this time.</p>
+  {% endif %}
+</div>
+{% endblock %}
