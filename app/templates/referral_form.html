@@ -1,0 +1,11 @@
+{% extends "base.html" %} {% block content %}
+<form method="POST" action="">
+  {{ form.hidden_tag() }}
+  <div>
+    {{ form.referral_name.label }}<br />{{ form.referral_name(size=30) }}
+  </div>
+  <div>{{ form.referral_id.label }}<br />{{ form.referral_id(size=30) }}</div>
+  <div>{{ form.referral_details.label }}<br />{{ form.referral_details }}</div>
+  <div>{{ form.submit() }}</div>
+</form>
+{% endblock %}
