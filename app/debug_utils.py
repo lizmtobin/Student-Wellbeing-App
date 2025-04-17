@@ -1,10 +1,12 @@
 from app import db
-from app.models import User, Student, Counsellor, WellbeingStaff, Admin
+from app.models import User, Student, Counsellor, WellbeingStaff, Admin, WellbeingLog
 from werkzeug.security import generate_password_hash
+from datetime import datetime, timedelta
 
 
 def reset_db():
     """Reset the database and seed with test data"""
+    # print("RESETTING DATABASE...")
     db.drop_all()
     db.create_all()
     seed_users()

@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, flash, request, send_file, send_from_directory
 from app import app
-from app.models import User, Student, Counsellor, WellbeingStaff
-from app.forms import ChooseForm, LoginForm
+from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog
+from app.forms import ChooseForm, LoginForm, WellbeingLogForm
 from flask_login import current_user, login_user, logout_user, login_required, fresh_login_required
 import sqlalchemy as sa
 from app import db
@@ -76,6 +76,53 @@ def debug_reset_db():
     reset_db()
     flash('Database has been reset with test data.', 'success')
     return redirect(url_for('home'))
+
+
+@app.route('/tracker', methods=['GET', 'POST'])
+@login_required
+def wellbeing_tracker():
+    #allow only students to access the tracker as they are the only ones 
+    #who can log moods
+    if not isinstance(current_user, Student):
+        flash("Only students have access to the wellbeing tracker logs and form.", "danger")
+        return redirect(url_for('home'))
+
+    form = WellbeingLogForm()
+
+    if form.validate_on_submit():
+        mood = form.mood.data
+        symptoms = form.symptoms.data
+
+        #flag if mood is critically low (3 or below)
+        alert = mood <=3
+
+        new_log = WellbeingLog(
+            user_id=current_user.id,
+            mood=mood,
+            symptoms=symptoms,
+            alert_flag=alert
+        )
+
+        db.session.add(new_log)
+        db.session.commit()
+
+        flash('Your wellbeing log has been saved.', 'success')
+
+        return redirect(url_for('wellbeing_tracker'))
+    
+
+    logs = WellbeingLog.query.filter_by(user_id=current_user.id).order_by(WellbeingLog.date_logged.asc()).all()
+    return render_template('wellbeing_tracker.html', title='Wellbeing Tracker', form=form, logs=logs)
+
+@app.route('/alerts')
+@login_required
+def view_alerts():
+    if not isinstance(current_user, (Counsellor, WellbeingStaff)):
+        flash("Access denied. Alerts are only available to wellbeing staff and counsellors.", "danger")
+        return redirect(url_for('home'))
+
+    alerts = WellbeingLog.query.filter_by(alert_flag=True).order_by(WellbeingLog.date_logged.desc()).all()
+    return render_template('alerts.html', title='Alerts', alerts=alerts)
 
 
 # Error handlers
