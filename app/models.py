@@ -80,6 +80,20 @@ class Admin(User):
 
     def __repr__(self):
         return f'<Admin {self.username}>'
+    
+class WellbeingLog(db.Model):
+    __tablename__='wellbeing_logs'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=False)
+    mood = db.Column(db.Integer, nullable=False)  
+    symptoms = db.Column(db.String(255), nullable=True)
+    date_logged = db.Column(db.DateTime, default=datetime.utcnow)
+    alert_flag = db.Column(db.Boolean, default=False) 
+
+    student = db.relationship('Student', backref='logs', lazy=True)
+
+    def __repr__(self):
+        return f'<WellbeingLog {self.id} - User {self.user_id}>'
 
 @login.user_loader
 def load_user(id):

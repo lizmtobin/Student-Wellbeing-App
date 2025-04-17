@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% import "bootstrap_wtf.html" as wtf %}
+{% block title %}Wellbeing Tracker{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Wellbeing Tracker</h2>
+
+    {{ wtf.quick_form(form, novalidate=True) }}
+
+    <hr>
+
+    <h4>Your Previous Logs</h4>
+    {% if logs %}
+    <ul class="list-group">
+        {% for log in logs|reverse %}
+        <li class="list-group-item">
+            <strong>{{ log.date_logged.strftime('%Y-%m-%d %H:%M') }}</strong><br>
+            Mood: {{ log.mood }}<br>
+            Symptoms: {{ log.symptoms }}<br>
+            {% if log.alert_flag %}
+            <span class="badge bg-danger">Flagged for wellbeing staff</span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    {% if logs|length > 1 %}
+    <div class="mt-5">
+        <h5 class="mb-3">Mood Trend</h5>
+        <canvas id="moodChart" width="400" height="200"></canvas>
+    </div>
+    {% else %}
+    <p class="mt-3 text-muted">Add more entries to view a trend chart.</p>
+    {% endif %}
+
+    {% else %}
+    <p>No logs yet. Submit your first entry above.</p>
+    {% endif %}
+</div>
+
+{% if logs|length > 1 %}
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('moodChart').getContext('2d');
+    const moodChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [
+                {% for log in logs %}
+                    "{{ log.date_logged.strftime('%d %b') }}",
+                {% endfor %}
+            ],
+            datasets: [{
+                label: 'Mood (1–10)',
+                data: [
+                    {% for log in logs %}
+                        {{ log.mood }},
+                    {% endfor %}
+                ],
+                fill: false,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    suggestedMin: 1,
+                    suggestedMax: 10
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
