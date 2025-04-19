@@ -95,6 +95,24 @@ class WellbeingLog(db.Model):
     def __repr__(self):
         return f'<WellbeingLog {self.id} - User {self.user_id}>'
 
+class Appointment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.id'), nullable=False)
+    staff_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
+    reason = db.Column(db.String(255))
+    status = db.Column(db.String(20), default='booked')
+
+    session_notes = db.relationship('SessionNotes', backref='appointment', uselist=False)
+
+class SessionNotes(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    appointment_id = db.Column(db.Integer, db.ForeignKey('appointment.id'), nullable=False)
+    staff_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
