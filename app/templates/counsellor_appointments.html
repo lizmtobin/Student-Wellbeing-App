@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Your Booked Appointments</h1>
+
+  {% if appointments %}
+    <ul>
+      {% for appointment in appointments %}
+        <li>
+          <strong>Student:</strong> {{ appointment.student.username if appointment.student else "Unassigned" }} <br>
+          <strong>Date:</strong> {{ appointment.start_time.strftime('%A %d %B %Y') }}<br>
+          <strong>Time:</strong> {{ appointment.start_time.strftime('%I:%M %p') }} - {{ appointment.end_time.strftime('%I:%M %p') }}<br>
+          <strong>Reason:</strong> {{ appointment.reason or "No reason provided" }}<br>
+          <strong>Status:</strong> {{ appointment.status or "Pending" }}
+        </li>
+        <hr>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No appointments booked yet.</p>
+  {% endif %}
+
+{% endblock %}
+
