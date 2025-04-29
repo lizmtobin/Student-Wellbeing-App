@@ -70,7 +70,23 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('account') }}">My Account</a>
                 </li>
+                {% if current_user.type == 'student' %}
+                    <li>
+                        <a class="nav-link" href="{{ url_for('book_appointment') }}">Book Counselling Appointment</a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="{{ url_for('view_appointment') }}">View Appointment Details</a>
+                    </li>
                 {% endif %}
+                {% if current_user.type == 'counsellor' %}
+                    <li>
+                        <a class="nav-link" href="{{ url_for('counsellor_appointments') }}">View Appointments</a>
+                    </li>
+                    <li>
+                        <a class="nav-link" href="{{ url_for('add_slot') }}">Add New Slots</a>
+                    </li>
+                {% endif %}
+            {% endif %}
             </ul>
             <ul class="navbar-nav mb-2 mb-lg-0">
                 {% if current_user.is_anonymous %}
@@ -85,6 +101,7 @@
                         <i class="fas fa-sign-out-alt me-1"></i>Logout
                     </a>
                 </li>
+
 
                 <!-- Dropdown menu for authenticated users -->
                 <li class="nav-item dropdown">

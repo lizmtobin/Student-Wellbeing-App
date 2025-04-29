@@ -1,5 +1,6 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from sqlalchemy.util import coerce_kw_type
 from wtforms import (
     SubmitField,
     HiddenField,
@@ -10,6 +11,7 @@ from wtforms import (
     TextAreaField,
     PasswordField,
 )
+from wtforms.fields.datetime import DateTimeField
 from wtforms.validators import (
     DataRequired,
     NumberRange,
@@ -80,3 +82,16 @@ class WellbeingLogForm(FlaskForm):
         ],
     )
     submit = SubmitField("Log entry")
+
+class AppointmentForm(FlaskForm):
+    counsellor_id = SelectField('Select Counsellor', coerce=int, validators=[DataRequired()])
+    start_time = SelectField('Start time' , validators=[DataRequired()])
+    end_time = DateTimeField('End Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    reason = TextAreaField('Reason for Appointment', validators=[DataRequired()])
+    submit = SubmitField('Book Appointment')
+
+class AddSlotForm(FlaskForm):
+    start_time = DateTimeField('Start Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    end_time = DateTimeField('End Time', format='%Y-%m-%d %H:%M', validators=[DataRequired()])
+    reason = TextAreaField('Optional Note')
+    submit = SubmitField('Add Slot')
