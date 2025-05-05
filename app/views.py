@@ -1,11 +1,3 @@
-from datetime import timedelta
-from gc import is_finalized
-from tkinter.messagebox import YESNO
-from traceback import format_list
-from turtledemo.clock import dtfont
-from zoneinfo import available_timezones
-
-from dns.name import from_unicode
 from flask import (
     render_template,
     redirect,
@@ -15,8 +7,6 @@ from flask import (
     send_file,
     send_from_directory,
 )
-from flask_migrate import current
-from wtforms.validators import readonly
 
 from app import app
 from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability
