@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Add a New Slot</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.start_time.label }}
+            {{ form.start_time(class="form-control", placeholder="YYYY-MM-DD HH:MM") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.end_time.label }}
+            {{ form.end_time(class="form-control", placeholder="YYYY-MM-DD HH:MM") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.reason.label }}
+            {{ form.reason(class="form-control", placeholder="Optional note...") }}
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Add Slot</button>
+    </form>
+</div>
+{% endblock %}

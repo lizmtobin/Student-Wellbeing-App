@@ -7,9 +7,10 @@ from flask import (
     send_file,
     send_from_directory,
 )
+
 from app import app
-from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog
-from app.forms import ChooseForm, LoginForm, ReferralForm, WellbeingLogForm
+from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability
+from app.forms import ChooseForm, LoginForm, ReferralForm, WellbeingLogForm, AppointmentForm, AddSlotForm
 from flask_login import (
     current_user,
     login_user,
@@ -22,7 +23,7 @@ from app import db
 from urllib.parse import urlsplit
 import csv
 import io
-import datetime
+from datetime import datetime, time
 from app.debug_utils import reset_db
 
 
@@ -163,6 +164,91 @@ def view_alerts():
     )
     return render_template("alerts.html", title="Alerts", alerts=alerts)
 
+
+@app.route("/book/appointment", methods=["GET", "POST"])
+@login_required
+def book_appointment():
+    form=AppointmentForm()
+    available_appointments = Appointment.query.filter_by(status='Available').order_by(Appointment.start_time).all()
+
+    return render_template('book_appointment.html', title="Book Appointment",  available_appointments=available_appointments, form=form)
+
+
+
+
+@app.route('/confirm_appointment/<int:appointment_id>', methods=['GET', 'POST'])
+@login_required
+def confirm_appointment(appointment_id):
+    appointment = Appointment.query.get_or_404(appointment_id)
+    form=AppointmentForm()
+    if appointment.student_id is not None:
+        flash('Sorry, this appointment has already been booked.', 'danger')
+        return redirect(url_for('book_appointment'))
+
+    if request.method == 'POST':
+        reason = request.form.get('reason')
+
+        if not reason:
+            flash('Please provide a reason for your appointment.', 'warning')
+            return redirect(request.url)
+
+        appointment.student_id = current_user.id
+        appointment.reason = reason
+        appointment.status = 'Booked'
+        db.session.commit()
+
+        flash('Your appointment has been booked successfully!', 'success')
+        return redirect(url_for('view_appointment'))
+
+    return render_template('confirm_appointment.html', title="Confirm Appointment", appointment=appointment, form=form)
+
+@app.route('/view_appointment')
+@login_required
+def view_appointment():
+    if not isinstance(current_user, Student):
+        flash("Only students can view their booked appointments.", "danger")
+        return redirect(url_for("home"))
+
+    appointments = Appointment.query.filter_by(student_id=current_user.id).order_by(Appointment.start_time.asc()).all()
+
+    return render_template('view_appointment.html', title="View Appointment", appointments=appointments)
+
+
+@app.route("/counsellor/appointments")
+@login_required
+def counsellor_appointments():
+    if not isinstance(current_user, Counsellor):
+        flash("Only counsellors can view this page.", "danger")
+        return redirect(url_for("home"))
+
+    appointments = Appointment.query.filter_by(counsellor_id=current_user.id).order_by(Appointment.start_time.asc()).all()
+
+    return render_template('counsellor_appointments.html', title='View Appointments', appointments=appointments)
+
+
+@app.route("/counsellor/add_slot", methods=["GET", "POST"])
+@login_required
+def add_slot():
+    if not isinstance(current_user, Counsellor):
+        flash("Only counsellors can add slots.", "danger")
+        return redirect(url_for('home'))
+
+    form = AddSlotForm()
+
+    if form.validate_on_submit():
+        new_slot = Appointment(
+            counsellor_id=current_user.id,
+            start_time=form.start_time.data,
+            end_time=form.end_time.data,
+            status='available'
+        )
+        db.session.add(new_slot)
+        db.session.commit()
+
+        flash("New slot added successfully!", "success")
+        return redirect(url_for('counsellor_calendar'))
+
+    return render_template('add_slot.html', title='Add New Slot', form=form)
 
 # Error handlers
 # See: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes

@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from enum import Enum
 
+
 class UserRole(Enum):
     STUDENT = 'student'
     COUNSELLOR = 'counsellor'
@@ -60,6 +61,9 @@ class Counsellor(User):
     availability = db.Column(db.String(200))
     __mapper_args__ = {'polymorphic_identity': 'counsellor'}
 
+    availabilities = db.relationship('CounsellorAvailability', back_populates='counsellor',
+                                     cascade="all, delete-orphan")
+
     def __repr__(self):
         return f'<Counsellor {self.username}>'
 
@@ -94,6 +98,34 @@ class WellbeingLog(db.Model):
 
     def __repr__(self):
         return f'<WellbeingLog {self.id} - User {self.user_id}>'
+
+class Appointment(db.Model):
+    __tablename__= 'appointments'
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), nullable=True)
+    counsellor_id = db.Column(db.Integer, db.ForeignKey('counsellors.id'), nullable=False)
+    day = db.Column(db.String(10), nullable=True)
+    start_time = db.Column(db.DateTime, nullable=False)
+    end_time = db.Column(db.DateTime, nullable=False)
+    reason = db.Column(db.String(255), nullable=True)
+    status = db.Column(db.String(50), default='Available')
+
+    counsellor = db.relationship('Counsellor', backref='appointments')
+    def __repr__(self):
+        return f'<Appointment {self.id}, Student {self.student_id}, Staff {self.staff_id}>'
+
+class CounsellorAvailability(db.Model):
+    __tablename__ = 'counsellor_availability'
+    id = db.Column(db.Integer, primary_key=True)
+    counsellor_id = db.Column(db.Integer, db.ForeignKey('counsellors.id'), nullable=False)
+    day_of_week = db.Column(db.String(10), nullable=False)
+    start_time = db.Column(db.Time, nullable=False)
+    end_time = db.Column(db.Time, nullable=False)
+
+    counsellor = db.relationship('Counsellor', back_populates='availabilities')
+
+    def __repr__(self):
+        return f"<CounsellorAvailability {self.counsellor.username}, {self.day_of_week} {self.start_time}-{self.end_time}>"
 
 @login.user_loader
 def load_user(id):

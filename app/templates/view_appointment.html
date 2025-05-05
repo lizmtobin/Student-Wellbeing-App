@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Your Appointments</h2>
+
+    {% if appointments %}
+        {% for appointment in appointments %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Counsellor: {{ appointment.counsellor.username }}</h5>
+
+                <p class="card-text">
+                    <strong>Date:</strong> {{ appointment.start_time.strftime('%A, %d %B %Y') }}<br>
+                    <strong>Time:</strong> {{ appointment.start_time.strftime('%I:%M %p') }} - {{ appointment.end_time.strftime('%I:%M %p') }}<br>
+                    <strong>Reason:</strong> {{ appointment.reason }}
+                </p>
+
+                {% if appointment.status %}
+                <p><strong>Status:</strong> {{ appointment.status }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div class="alert alert-warning" role="alert">
+        You have no booked appointments.
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('book_appointment') }}" class="btn btn-primary mt-3">Book Another Appointment</a>
+</div>
+{% endblock %}
