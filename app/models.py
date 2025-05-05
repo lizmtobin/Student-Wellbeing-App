@@ -98,3 +98,12 @@ class WellbeingLog(db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+class CounsellingWaitlist(db.Model):
+    __tablename__='counselling_waitlist'
+    student_id = db.Column(db.Integer, primary_key=True)
+    student_name = db.Column(db.String(50), nullable=False)
+    referral_info = db.Column(db.Text, nullable=False)
+    referral_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    
