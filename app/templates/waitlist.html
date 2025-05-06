@@ -1,0 +1,29 @@
+{% extends "base.html" %} {% block content %}
+
+<body>
+    <h1>{{ title }}</h1>
+
+    <table border="1">
+        <tr>
+            <th>Student ID</th>
+            <th>Student Name</th>
+            <th>Referral Info</th>
+            <th>Referral Date</th>
+        </tr>
+        {% for referral in referrals %}
+        <tr>
+            <td>{{ referral.student_id }}</td>
+            <td>{{ referral.student_name }}</td>
+            <td>{{ referral.referral_info }}</td>
+            <td>{{ referral.referral_date.strftime('%Y-%m-%d') }}</td>
+            <td>
+            <form action="{{ url_for('delete_referral', student_id=referral.student_id) }}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Are you sure you want to delete this referral?');">Delete</button>
+            </form>
+        </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+
+{% endblock %}

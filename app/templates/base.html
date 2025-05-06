@@ -72,6 +72,9 @@
                 </li>
                 {% if current_user.type == 'student' %}
                     <li>
+                        <a class="nav-link" href="{{ url_for('referral_form') }}">Self-Refer for Counselling</a>
+                    </li>
+                    <li>
                         <a class="nav-link" href="{{ url_for('book_appointment') }}">Book Counselling Appointment</a>
                     </li>
                     <li>
@@ -110,7 +113,8 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         {% if current_user.type == 'student' %}
-                        <li><a class="dropdown-item" href="{{ url_for('wellbeing_tracker') }}">Tracker</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('wellbeing_tracker') }}">Wellbeing Tracker</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('view_referral') }}">View Counselling Referral</a></li>
                         {% endif %}
                         {% if current_user.type in ['counsellor', 'wellbeing_staff'] %}
                         <li><a class="dropdown-item" href="{{ url_for('view_alerts') }}">Alerts</a></li>

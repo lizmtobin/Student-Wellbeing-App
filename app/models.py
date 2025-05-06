@@ -3,7 +3,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as so
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login
 from dataclasses import dataclass
@@ -110,6 +110,7 @@ class Appointment(db.Model):
     reason = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(50), default='Available')
 
+    student = db.relationship('Student', backref= 'appointments')
     counsellor = db.relationship('Counsellor', backref='appointments')
     def __repr__(self):
         return f'<Appointment {self.id}, Student {self.student_id}, Staff {self.staff_id}>'
@@ -130,3 +131,31 @@ class CounsellorAvailability(db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+class CounsellingWaitlist(db.Model):
+    __tablename__='counselling_waitlist'
+    user_id = db.Column(db.Integer, db.ForeignKey('students.id'), primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
+    student_name = db.Column(db.String(50), nullable=False)
+    referral_info = db.Column(db.Text, nullable=False)
+    referral_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship(
+        'Student',
+        foreign_keys=[user_id],
+        backref='referrals_by_user',
+        lazy=True
+    )
+
+    student = db.relationship(
+        'Student',
+        foreign_keys=[student_id],
+        backref='referrals_about_student',
+        lazy=True
+    )
+
+    def __repr__(self):
+        return (f"user_id = {self.user_id}, student_id = {self.student_id}, student_name = {self.student_name}, referral_info = {self.referral_info[:20]}, referral_date = {self.referral_date}")
+
+
+
