@@ -133,8 +133,15 @@ def load_user(id):
 
 class CounsellingWaitlist(db.Model):
     __tablename__='counselling_waitlist'
-    student_id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.id'), primary_key=True)
     student_name = db.Column(db.String(50), nullable=False)
     referral_info = db.Column(db.Text, nullable=False)
     referral_date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    student = db.relationship('Student', backref='referral', lazy=True)
+
+    def __repr__(self):
+        return (f"student_id = {self.student_id}, student_name = {self.student_name}, referral_info = {self.referral_info[:20]}, referral_date = {self.referral_date}")
+
+
 

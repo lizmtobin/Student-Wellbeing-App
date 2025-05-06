@@ -8,8 +8,8 @@ from flask import (
     send_from_directory,
 )
 
-from app import app
-from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability
+from app import app, db
+from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability, CounsellingWaitlist
 from app.forms import ChooseForm, LoginForm, ReferralForm, WellbeingLogForm, AppointmentForm, AddSlotForm
 from flask_login import (
     current_user,
@@ -19,7 +19,6 @@ from flask_login import (
     fresh_login_required,
 )
 import sqlalchemy as sa
-from app import db
 from urllib.parse import urlsplit
 import csv
 import io
@@ -110,6 +109,18 @@ def referral_form():
     return render_template(
         "referral_form.html", title="Counselling Self-Referral Form", form=form
     )
+
+@app.route("/view_waitlist")
+#@login_required
+def view_waitlist():
+#    if not isinstance(current_user, WellbeingStaff):
+#        flash(
+#            "Only wellbeing-staff can view the counselling waiting list.",
+#            "danger",
+#        )
+#        return redirect(url_for("home"))
+    referrals = CounsellingWaitlist.query.all()
+    return render_template('waitlist.html', referrals=referrals)
 
 
 # Debug route to reset database - go to the url /debug/reset-db to reset the database

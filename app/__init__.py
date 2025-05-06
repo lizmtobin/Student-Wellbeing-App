@@ -5,7 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import sqlalchemy as sa
 import sqlalchemy.orm as so
-
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.jinja_env.undefined = StrictUndefined
@@ -13,6 +13,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 login = LoginManager(app)
 login.login_view = 'login'
+migrate = Migrate(app, db)
 
 from app import views, models
 from app.debug_utils import reset_db
