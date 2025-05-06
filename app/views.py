@@ -101,7 +101,11 @@ def referral_form():
             "danger",
         )
         return redirect(url_for("home"))
-
+    #checking if referral already exists for this user in the database
+    existing_referral = CounsellingWaitlist.query.filter_by(student_id=current_user.student_id).first()
+    if existing_referral:
+        flash("You have already submitted a counselling self-referral form.", "info")
+        return redirect(url_for("view_referral"))
     form = ReferralForm()
     if form.validate_on_submit():
         user_id = current_user.id
@@ -115,7 +119,8 @@ def referral_form():
         flash(f"Counselling Self Referral Successfully Submitted")
         return redirect(url_for("home"))
     else:
-        flash(form.errors)
+        if request.method == "POST":
+            flash(form.errors)
     return render_template(
         "referral_form.html", title="Counselling Self-Referral Form", form=form
     )
