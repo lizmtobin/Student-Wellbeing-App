@@ -1,0 +1,52 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+import pytest
+from app import app, db
+from app.models import User, WellbeingLog
+
+@pytest.fixture
+def client():
+    app.config['TESTING'] = True
+    app.config['WTF_CSRF_ENABLED'] = False
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
+
+    with app.app_context():
+        db.drop_all()
+        db.create_all()
+        #create test student user
+        user = User(username='student1', email='student1@example.com', type='student')
+        user.set_password('password123')
+        db.session.add(user)
+        db.session.commit()
+
+    return app.test_client()
+
+def login(client):
+    return client.post('/login', data={
+        'username': 'student1',
+        'password': 'password123',
+        'type': 'student'
+    }, follow_redirects=True)
+
+def test_log_wellbeing_positive(client):
+    """Test valid wellbeing log submission."""
+    login(client)
+    response = client.post('/tracker', data={
+        'mood': 5,
+        'symptoms': 'Feeling okay.'
+    }, follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b'Your wellbeing log has been saved.' in response.data
+
+def test_log_wellbeing_negative(client):
+    """Test invalid wellbeing log submission (mood out of range)."""
+    login(client)
+    response = client.post('/tracker', data={
+        'mood': 100,  #invalid
+        'symptoms': 'Too high mood'
+    }, follow_redirects=True)
+
+    assert b'Number must be between 1 and 10.' in response.data
