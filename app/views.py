@@ -8,8 +8,8 @@ from flask import (
     send_from_directory,
 )
 
-from app import app
-from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability
+from app import app, db
+from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability, CounsellingWaitlist
 from app.forms import ChooseForm, LoginForm, ReferralForm, WellbeingLogForm, AppointmentForm, AddSlotForm
 from flask_login import (
     current_user,
@@ -19,7 +19,6 @@ from flask_login import (
     fresh_login_required,
 )
 import sqlalchemy as sa
-from app import db
 from urllib.parse import urlsplit
 import csv
 import io
@@ -85,18 +84,6 @@ def logout():
     logout_user()
     return redirect(url_for("home"))
 
-
-@app.route("/referral_form", methods=["GET", "POST"])
-def referral_form():
-    form = ReferralForm()
-    if form.validate_on_submit():
-        flash(f"Counselling Self Referral Successfully Submitted")
-        return redirect(url_for("home"))
-    return render_template(
-        "referral_form.html", title="Counselling Self-Referral Form", form=form
-    )
-
-
 # Debug route to reset database - go to the url /debug/reset-db to reset the database
 @app.route("/debug/reset-db")
 def debug_reset_db():
@@ -104,6 +91,75 @@ def debug_reset_db():
     flash("Database has been reset with test data.", "success")
     return redirect(url_for("home"))
 
+
+@app.route("/referral_form", methods=["GET", "POST"])
+@login_required
+def referral_form():
+    if not isinstance(current_user, Student):
+        flash(
+            "Only students have access to the the counselling self-referral form.",
+            "danger",
+        )
+        return redirect(url_for("home"))
+    #checking if referral already exists for this user in the database
+    existing_referral = CounsellingWaitlist.query.filter_by(student_id=current_user.student_id).first()
+    if existing_referral:
+        flash("You have already submitted a counselling self-referral form.", "info")
+        return redirect(url_for("view_referral"))
+    form = ReferralForm()
+    if form.validate_on_submit():
+        user_id = current_user.id
+        student_id = current_user.student_id
+        student_name = form.referral_name.data
+        referral_info = form.referral_details.data
+        new_referral = CounsellingWaitlist(user_id=user_id, student_id=student_id, student_name=student_name, referral_info=referral_info)
+        db.session.add(new_referral)
+        db.session.commit()
+        #Above code adds new referral to the database using data submitted via the self-referral form.
+        flash(f"Counselling Self Referral Successfully Submitted")
+        return redirect(url_for("home"))
+    else:
+        if request.method == "POST":
+            flash(form.errors)
+    return render_template(
+        "referral_form.html", title="Counselling Self-Referral Form", form=form
+    )
+
+@app.route("/view_waitlist")
+@login_required
+def view_waitlist():
+    if not isinstance(current_user, WellbeingStaff):
+        flash(
+            "Only wellbeing-staff can view the counselling waiting list.",
+            "danger",
+        )
+        return redirect(url_for("home"))
+    referrals = CounsellingWaitlist.query.all()
+    return render_template('waitlist.html', title="Counselling Waitlist", referrals=referrals)
+
+@app.route('/delete_referral/<int:student_id>', methods=['POST'])
+
+def delete_referral(student_id):
+    referral = CounsellingWaitlist.query.get_or_404(student_id)
+    db.session.delete(referral)
+    db.session.commit()
+    flash('Referral deleted successfully.', 'success')
+    return redirect(url_for('view_waitlist'))
+
+@app.route("/my_referral")
+@login_required
+def view_referral():
+    if not isinstance(current_user, Student):
+        flash(
+            "Only students can view this page.",
+            "danger",
+        )
+        return redirect(url_for("home"))
+    referral = CounsellingWaitlist.query.filter_by(user_id=current_user.id).first()
+    if referral is None:
+        flash('No referral found for your account.', 'danger')
+        return redirect(url_for('home'))
+    return render_template('referral_detail.html', title='My Referral', referral=referral)
 
 @app.route("/tracker", methods=["GET", "POST"])
 @login_required
@@ -172,8 +228,6 @@ def book_appointment():
     available_appointments = Appointment.query.filter_by(status='Available').order_by(Appointment.start_time).all()
 
     return render_template('book_appointment.html', title="Book Appointment",  available_appointments=available_appointments, form=form)
-
-
 
 
 @app.route('/confirm_appointment/<int:appointment_id>', methods=['GET', 'POST'])
