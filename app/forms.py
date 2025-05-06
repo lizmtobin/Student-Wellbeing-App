@@ -51,8 +51,7 @@ class LoginForm(FlaskForm):
 
 
 class ReferralForm(FlaskForm):
-    referral_name = StringField("Name", validators=[DataRequired()])
-    referral_id = StringField("Student ID", validators=[DataRequired()])
+    referral_name = StringField("Preferred Name", validators=[DataRequired()])
     referral_details = TextAreaField(
         "Please summarise your reasons for accessing the University Counselling "
         "service and any issues you need support with:",
