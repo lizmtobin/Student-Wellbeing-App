@@ -87,9 +87,24 @@ def logout():
 
 
 @app.route("/referral_form", methods=["GET", "POST"])
+@login_required
 def referral_form():
+    if not isinstance(current_user, Student):
+        flash(
+            "Only students have access to the the counselling self-referral form.",
+            "danger",
+        )
+        return redirect(url_for("home"))
+
     form = ReferralForm()
     if form.validate_on_submit():
+        student_id = form.referral_id.data
+        student_name = form.referral_name.data
+        referral_info = form.referral_details.data
+        new_referral = CounsellingWaitlist(student_id=student_id, student_name=student_name, referral_info=referral_info)
+        db.session.add(new_referral)
+        db.session.commit()
+        #Above code adds new referral to the database using data submitted via the self-referral form.
         flash(f"Counselling Self Referral Successfully Submitted")
         return redirect(url_for("home"))
     return render_template(
