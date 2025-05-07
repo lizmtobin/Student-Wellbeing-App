@@ -150,11 +150,10 @@ class CounsellingWaitlist(db.Model):
 
 class ApprovedReferrals(db.Model):
     __tablename__ = 'approved_referrals'
-    id = db.Column(db.Integer, primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), primary_key=True)
     student_name = db.Column(db.String(50), nullable=False)
     referral_info = db.Column(db.Text, nullable=False)
-    referral_date = db.Column(db.DateTime, default=datetime.utcnow)
+    referral_date = db.Column(db.DateTime, nullable=False)
     approved_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     student = db.relationship('Student', backref='approved_referrals', lazy=True)

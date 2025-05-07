@@ -281,6 +281,18 @@ def view_alerts():
 @app.route("/book/appointment", methods=["GET", "POST"])
 @login_required
 def book_appointment():
+    #checks that user is a student
+    if current_user.type != 'student':
+        flash("Only students can book appointments.", "danger")
+        return redirect(url_for('home'))
+    #checks if student has been approved for counselling, redirects if not
+    approved = ApprovedReferrals.query.filter_by(student_id=current_user.student_id).first()
+    if not approved:
+        flash(
+            "You must be approved for counselling to book an appointment. Please complete a self-referral form or check the status of your referral.",
+            "danger")
+        return redirect(url_for("home"))
+
     form=AppointmentForm()
     available_appointments = Appointment.query.filter_by(status='Available').order_by(Appointment.start_time).all()
 
