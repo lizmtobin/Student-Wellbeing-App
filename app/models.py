@@ -3,7 +3,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as so
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, backref
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login
 from dataclasses import dataclass
@@ -110,6 +110,7 @@ class Appointment(db.Model):
     reason = db.Column(db.String(255), nullable=True)
     status = db.Column(db.String(50), default='Available')
 
+    student = db.relationship('Student', backref= 'appointments')
     counsellor = db.relationship('Counsellor', backref='appointments')
     def __repr__(self):
         return f'<Appointment {self.id}, Student {self.student_id}, Staff {self.staff_id}>'
