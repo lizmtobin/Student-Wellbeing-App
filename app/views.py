@@ -9,7 +9,8 @@ from flask import (
 )
 
 from app import app, db
-from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability, CounsellingWaitlist
+from app.models import User, Student, Counsellor, WellbeingStaff, WellbeingLog, Appointment, CounsellorAvailability, \
+    CounsellingWaitlist, ApprovedReferrals
 from app.forms import ChooseForm, LoginForm, ReferralForm, WellbeingLogForm, AppointmentForm, AddSlotForm
 from flask_login import (
     current_user,
@@ -142,11 +143,37 @@ def approve_referral(student_id):
     if current_user.type != 'wellbeing_staff':
         flash("Only wellbeing staff can approve referrals.", "danger")
         return redirect(url_for('home'))
+
     referral = CounsellingWaitlist.query.get_or_404(student_id)
+
+    # Move referral to ApprovedReferrals
+    approved_referral = ApprovedReferrals(
+        student_id=referral.student_id,
+        student_name=referral.student_name,
+        referral_info=referral.referral_info,
+        referral_date=referral.referral_date,
+        approved_date=datetime.utcnow()
+    )
+
+    db.session.add(approved_referral)
+    #delete referral from counselling waiting list
     db.session.delete(referral)
     db.session.commit()
-    flash(f"Referral for {referral.student_name} has been approved and removed from the waitlist.", "success")
+
+    flash(f"Referral for {referral.student_name}, ID: {referral.student_id} approved and moved to approved referrals.", "success")
     return redirect(url_for('view_waitlist'))
+
+#For wellbeing staff to view approved referrals.
+@app.route('/view_approved_referrals')
+@login_required
+def approved_referrals():
+    if current_user.type != 'wellbeing_staff':
+        flash("Only wellbeing staff can view approved referrals.", "danger")
+        return redirect(url_for('home'))
+
+    approved_referrals = ApprovedReferrals.query.all()
+    return render_template('approved_referrals.html', title="Approved Referrals", approved_referrals=approved_referrals)
+
 
 #For student users to view and edit/delete their own referral
 @app.route("/view_referral")

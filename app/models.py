@@ -148,5 +148,17 @@ class CounsellingWaitlist(db.Model):
     def __repr__(self):
         return (f"student_id = {self.student_id}, student_name = {self.student_name}, referral_info = {self.referral_info[:20]}, referral_date = {self.referral_date}")
 
+class ApprovedReferrals(db.Model):
+    __tablename__ = 'approved_referrals'
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
+    student_name = db.Column(db.String(50), nullable=False)
+    referral_info = db.Column(db.Text, nullable=False)
+    referral_date = db.Column(db.DateTime, default=datetime.utcnow)
+    approved_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    student = db.relationship('Student', backref='approved_referrals', lazy=True)
+
+    def __repr__(self):
+        return f"ApprovedReferral(student_id={self.student_id}, student_name={self.student_name})"
 

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Approved Referrals</h1>
+
+<table class="table table-bordered table-hover">
+    <thead class="thead-dark">
+        <tr>
+            <th>Student ID</th>
+            <th>Student Name</th>
+            <th>Referral Info</th>
+            <th>Referral Date</th>
+            <th>Approved Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for referral in approved_referrals %}
+        <tr>
+            <td>{{ referral.student_id }}</td>
+            <td>{{ referral.student_name }}</td>
+            <td>{{ referral.referral_info }}</td>
+            <td>{{ referral.referral_date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ referral.approved_date.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="5" class="text-center">No approved referrals found.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<a href="{{ url_for('home') }}" class="btn btn-secondary">Back to Home</a>
+
+{% endblock %}
