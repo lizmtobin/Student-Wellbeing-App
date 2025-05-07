@@ -18,6 +18,13 @@ migrate = Migrate(app, db)
 from app import views, models
 from app.debug_utils import reset_db
 
+@app.cli.command("seed-db")
+def seed_db_command():
+    """Seed the database with test data."""
+    print("Seeding database...")
+    reset_db()
+    print("Database seeded successfully!")
+
 @app.shell_context_processor
 def make_shell_context():
     return dict(db=db, sa=sa, so=so, reset_db=reset_db)

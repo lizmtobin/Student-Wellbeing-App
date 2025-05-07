@@ -87,7 +87,13 @@ unisupport/
 2. **Initialize the database**
    You can initialize the database in two ways:
 
-   a. Using the Python shell:
+   a. Using the Flask CLI command:
+
+   ```bash
+   flask seed-db
+   ```
+
+   b. Using the Python shell:
 
    ```bash
    # Start Python shell
@@ -98,21 +104,13 @@ unisupport/
    >>> reset_db()
    ```
 
-   b. Using the debug route (after starting the server):
-
-   ```bash
-   # Start the server
-   flask run
-
-   # In your browser, visit:
-   http://localhost:5000/debug/reset-db
-   ```
-
    Both methods will:
 
    - Create all necessary database tables
    - Seed the database with test users for each role
    - Create an admin user (username: 'admin', password: 'admin123')
+
+   Note: The database is not automatically seeded on startup. You must explicitly run one of the above commands to initialize the database.
 
 3. **Run the development server**
    ```bash
@@ -161,17 +159,6 @@ Run the test suite:
 python -m pytest tests/
 ```
 
-## Contributing to the project
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Team member contribution
 

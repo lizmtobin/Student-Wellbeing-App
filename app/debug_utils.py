@@ -3,10 +3,14 @@ from app.models import User, Student, Counsellor, WellbeingStaff, Admin, Wellbei
 from werkzeug.security import generate_password_hash
 from datetime import datetime, timedelta, time
 
-
-
 def reset_db():
-    """Reset the database and seed with test data"""
+    """Reset the database and seed with test data
+    
+    WARNING: This function is for development purposes only.
+    It will delete all existing data and create test users with known credentials.
+    DO NOT use in production.
+    """
+    print("  WARNING: This is a development-only operation!")
     print("  - Dropping all tables...")
     db.drop_all()
     print("  - Creating all tables...")
@@ -16,7 +20,6 @@ def reset_db():
     print("  - Seeding appointments...")
     seed_appointments()
     print("  ✓ Database reset and seeded successfully!")
-
 
 def seed_users():
     """Seed the database with test users"""
