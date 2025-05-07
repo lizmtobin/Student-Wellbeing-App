@@ -92,7 +92,7 @@ def debug_reset_db():
     flash("Database has been reset with test data.", "success")
     return redirect(url_for("home"))
 
-
+#Counselling self-referral form
 @app.route("/referral_form", methods=["GET", "POST"])
 @login_required
 def referral_form():
@@ -124,6 +124,7 @@ def referral_form():
     return render_template(
         "referral_form.html", title="Counselling Self-Referral Form", form=form
     )
+
 #For wellbeing staff to view the whole counselling waiting list and approve referrals
 @app.route("/view_waitlist")
 @login_required
