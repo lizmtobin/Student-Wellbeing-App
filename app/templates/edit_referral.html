@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Edit Referral Info</h1>
+
+<form method="POST">
+    <label for="referral_info">Referral Info:</label><br>
+    <textarea id="referral_info" name="referral_info" rows="6" cols="60">{{ referral.referral_info }}</textarea><br><br>
+
+    <button type="submit">Save Changes</button>
+    <a href="{{ url_for('view_referral', student_id=referral.student_id) }}"><button type="button">Cancel</button></a>
+</form>
+
+{% endblock %}

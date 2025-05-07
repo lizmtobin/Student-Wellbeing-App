@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 
-<h1>Counselling Waitlist</h1>
+<h1>Approved Referrals</h1>
 
 <table class="table table-bordered table-hover">
     <thead class="thead-dark">
@@ -10,25 +10,21 @@
             <th>Student Name</th>
             <th>Referral Info</th>
             <th>Referral Date</th>
-            <th>Actions</th>
+            <th>Approved Date</th>
         </tr>
     </thead>
     <tbody>
-        {% for referral in referrals %}
+        {% for referral in approved_referrals %}
         <tr>
             <td>{{ referral.student_id }}</td>
             <td>{{ referral.student_name }}</td>
             <td>{{ referral.referral_info }}</td>
             <td>{{ referral.referral_date.strftime('%Y-%m-%d') }}</td>
-            <td>
-                <form action="{{ url_for('approve_referral', student_id=referral.student_id) }}" method="post" style="display:inline;">
-                    <button type="submit" class="btn btn-success btn-sm">Approve</button>
-                </form>
-            </td>
+            <td>{{ referral.approved_date.strftime('%Y-%m-%d') }}</td>
         </tr>
         {% else %}
         <tr>
-            <td colspan="5" class="text-center">No referrals found.</td>
+            <td colspan="5" class="text-center">No approved referrals found.</td>
         </tr>
         {% endfor %}
     </tbody>
