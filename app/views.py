@@ -6,6 +6,7 @@ from flask import (
     request,
     send_file,
     send_from_directory,
+    abort,
 )
 
 from app import app, db
@@ -145,7 +146,9 @@ def approve_referral(student_id):
         flash("Only wellbeing staff can approve referrals.", "danger")
         return redirect(url_for('home'))
 
-    referral = CounsellingWaitlist.query.get_or_404(student_id)
+    referral = db.session.get(CounsellingWaitlist, student_id)
+    if referral is None:
+        return abort(404)
 
     # Move referral to ApprovedReferrals
     approved_referral = ApprovedReferrals(
@@ -195,7 +198,9 @@ def view_referral():
 @app.route('/edit_referral/<int:student_id>', methods=['GET', 'POST'])
 @login_required
 def edit_referral(student_id):
-    referral = CounsellingWaitlist.query.get_or_404(student_id)
+    referral = db.session.get(CounsellingWaitlist, student_id)
+    if referral is None:
+        return abort(404)
 
     if request.method == "POST":
         # Update the referral_info from the form
@@ -210,7 +215,9 @@ def edit_referral(student_id):
 @app.route("/delete_referral/<int:student_id>", methods=["POST"])
 @login_required
 def delete_referral(student_id):
-    referral = CounsellingWaitlist.query.get_or_404(student_id)
+    referral = db.session.get(CounsellingWaitlist, student_id)
+    if referral is None:
+        return abort(404)
     db.session.delete(referral)
     db.session.commit()
     flash("Referral deleted successfully!", "success")
@@ -303,7 +310,9 @@ def book_appointment():
 @app.route('/confirm_appointment/<int:appointment_id>', methods=['GET', 'POST'])
 @login_required
 def confirm_appointment(appointment_id):
-    appointment = Appointment.query.get_or_404(appointment_id)
+    appointment = db.session.get(Appointment, appointment_id)
+    if appointment is None:
+        return abort(404)
     form=AppointmentForm()
     if appointment.student_id is not None:
         flash('Sorry, this appointment has already been booked.', 'danger')

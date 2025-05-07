@@ -96,11 +96,10 @@ unisupport/
    b. Using the Python shell:
 
    ```bash
-   # Start Python shell
-   python
+   # From the console start the shell 
+   flask shell
 
-   # In Python shell
-   >>> from app.debug_utils import reset_db
+   # In shell write:
    >>> reset_db()
    ```
 
@@ -109,6 +108,7 @@ unisupport/
    - Create all necessary database tables
    - Seed the database with test users for each role
    - Create an admin user (username: 'admin', password: 'admin123')
+   - As only Authorised Users can login, you will need to seed Users to test the App
 
    Note: The database is not automatically seeded on startup. You must explicitly run one of the above commands to initialize the database.
 

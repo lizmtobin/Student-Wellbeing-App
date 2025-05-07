@@ -132,19 +132,19 @@ class CounsellorAvailability(db.Model):
 def load_user(id):
     try:
         # First get the base user to determine the type
-        user = User.query.get(int(id))
+        user = db.session.get(User, int(id))
         if user is None:
             return None
         
         # Then load the specific subclass based on type
         if user.type == 'student':
-            return Student.query.get(int(id))
+            return db.session.get(Student, int(id))
         elif user.type == 'counsellor':
-            return Counsellor.query.get(int(id))
+            return db.session.get(Counsellor, int(id))
         elif user.type == 'wellbeing_staff':
-            return WellbeingStaff.query.get(int(id))
+            return db.session.get(WellbeingStaff, int(id))
         elif user.type == 'admin':
-            return Admin.query.get(int(id))
+            return db.session.get(Admin, int(id))
         return user
     except Exception as e:
         print(f"Error loading user: {e}")
