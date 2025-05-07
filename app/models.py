@@ -130,12 +130,30 @@ class CounsellorAvailability(db.Model):
 
 @login.user_loader
 def load_user(id):
-    return User.query.get(int(id))
+    try:
+        # First get the base user to determine the type
+        user = User.query.get(int(id))
+        if user is None:
+            return None
+        
+        # Then load the specific subclass based on type
+        if user.type == 'student':
+            return Student.query.get(int(id))
+        elif user.type == 'counsellor':
+            return Counsellor.query.get(int(id))
+        elif user.type == 'wellbeing_staff':
+            return WellbeingStaff.query.get(int(id))
+        elif user.type == 'admin':
+            return Admin.query.get(int(id))
+        return user
+    except Exception as e:
+        print(f"Error loading user: {e}")
+        return None
 
 class CounsellingWaitlist(db.Model):
     __tablename__='counselling_waitlist'
     user_id = db.Column(db.Integer, db.ForeignKey('students.id'), primary_key=True)
-    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'))
+    student_id = db.Column(db.String(20), db.ForeignKey('students.student_id'))
     student_name = db.Column(db.String(50), nullable=False)
     referral_info = db.Column(db.Text, nullable=False)
     referral_date = db.Column(db.DateTime, default=datetime.utcnow)
@@ -143,15 +161,15 @@ class CounsellingWaitlist(db.Model):
     user = db.relationship(
         'Student',
         foreign_keys=[user_id],
-        backref='referrals_by_user',
-        lazy=True
+        backref=db.backref('referrals_by_user', lazy='dynamic'),
+        lazy='joined'
     )
 
     student = db.relationship(
         'Student',
         foreign_keys=[student_id],
-        backref='referrals_about_student',
-        lazy=True
+        backref=db.backref('referrals_about_student', lazy='dynamic'),
+        lazy='joined'
     )
 
     def __repr__(self):
