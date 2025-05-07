@@ -3,7 +3,7 @@ import sqlalchemy as sa
 import sqlalchemy.orm as so
 from flask_login import UserMixin
 from sqlalchemy import ForeignKey
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from app import db, login
 from dataclasses import dataclass
@@ -152,28 +152,31 @@ def load_user(id):
 
 class CounsellingWaitlist(db.Model):
     __tablename__='counselling_waitlist'
-    user_id = db.Column(db.Integer, db.ForeignKey('students.id'), primary_key=True)
-    student_id = db.Column(db.String(20), db.ForeignKey('students.student_id'))
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), primary_key=True)
     student_name = db.Column(db.String(50), nullable=False)
     referral_info = db.Column(db.Text, nullable=False)
     referral_date = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship(
-        'Student',
-        foreign_keys=[user_id],
-        backref=db.backref('referrals_by_user', lazy='dynamic'),
-        lazy='joined'
-    )
-
     student = db.relationship(
         'Student',
         foreign_keys=[student_id],
-        backref=db.backref('referrals_about_student', lazy='dynamic'),
-        lazy='joined'
+        backref='referrals_about_student',
+        lazy=True
     )
 
     def __repr__(self):
-        return (f"user_id = {self.user_id}, student_id = {self.student_id}, student_name = {self.student_name}, referral_info = {self.referral_info[:20]}, referral_date = {self.referral_date}")
+        return (f"student_id = {self.student_id}, student_name = {self.student_name}, referral_info = {self.referral_info[:20]}, referral_date = {self.referral_date}")
 
+class ApprovedReferrals(db.Model):
+    __tablename__ = 'approved_referrals'
+    student_id = db.Column(db.Integer, db.ForeignKey('students.student_id'), primary_key=True)
+    student_name = db.Column(db.String(50), nullable=False)
+    referral_info = db.Column(db.Text, nullable=False)
+    referral_date = db.Column(db.DateTime, nullable=False)
+    approved_date = db.Column(db.DateTime, default=datetime.utcnow)
 
+    student = db.relationship('Student', backref='approved_referrals', lazy=True)
+
+    def __repr__(self):
+        return f"ApprovedReferral(student_id={self.student_id}, student_name={self.student_name})"
 
