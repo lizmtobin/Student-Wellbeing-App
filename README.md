@@ -1,6 +1,6 @@
 # UniSupport - University Mental Health Support Platform
 
-A Flask-based web application designed to streamline access to mental health support services for university students. The platform provides a centralized system for self-referrals, appointment management, and wellbeing tracking.
+A Flask-based web application designed to streamline access to mental health support services for university students. The platform provides a centralized system for self-referrals, appointment booking and management, and wellbeing tracking.
 
 ## Features
 
@@ -39,6 +39,7 @@ A Flask-based web application designed to streamline access to mental health sup
   - Displays dates on the x-axis and mood levels on the y-axis
 
 - **Alert System**
+
   - If a student's mood rating is ≤ 3, the entry is flagged with `alert_flag=True`
   - Counsellors and wellbeing staff can view flagged logs in the `/alerts` route
   - Other roles cannot access `/tracker`; staff cannot log or view student logs
@@ -63,10 +64,15 @@ unisupport/
 │   ├── views.py          # Route handlers and business logic
 │   ├── forms.py          # WTForms for data validation
 │   ├── debug_utils.py    # Development utilities
-│   └── templates/        # Jinja2 templates
+│   ├── templates/        # Jinja2 templates
+│   ├── static/
+│   └── data/
 ├── tests/                # Test suite
 ├── requirements.txt      # Python dependencies
-└── README.md            # Project documentation
+├── run.py
+├── config.py
+├── .gitignore
+└── README.md             # Project documentation
 ```
 
 ## Setup and Installation
@@ -155,7 +161,7 @@ Run the test suite:
 python -m pytest tests/
 ```
 
-## Contributing
+## Contributing to the project
 
 1. Fork the repository
 2. Create a feature branch
@@ -167,8 +173,12 @@ python -m pytest tests/
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Acknowledgments
+## Team member contribution
 
-- Flask and SQLAlchemy communities
-- Bootstrap and Font Awesome for UI components
-- University mental health support teams for guidance
+| Student Name & ID  | Contribution (%) | Key Contributions / Tasks Completed    | Comments (if any) | Signature |
+| ------------------ | ---------------- | -------------------------------------- | ----------------- | --------- |
+| Vasiliki Ziaka     | 25%              | tracker, unit testing, video           |                   | VZ        |
+| Alexander Bond     | 25%              | referral, unit testing, video          |                   |           |
+| Nikki Evans        | 25%              | booking system, video                  |                   |           |
+| Elizabeth Tobin    | 25%              | core structure and setup, login, video |                   |           |
+| Joseph Liam Fisher | 0%               |                                        |                   |           |
