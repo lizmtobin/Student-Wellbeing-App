@@ -1,6 +1,6 @@
 # UniSupport - University Mental Health Support Platform
 
-A Flask-based web application designed to streamline access to mental health support services for university students. The platform provides a centralized system for self-referrals, appointment management, and wellbeing tracking.
+A Flask-based web application designed to streamline access to mental health support services for university students. The platform provides a centralized system for self-referrals, appointment booking and management, and wellbeing tracking.
 
 ## Features
 
@@ -39,6 +39,7 @@ A Flask-based web application designed to streamline access to mental health sup
   - Displays dates on the x-axis and mood levels on the y-axis
 
 - **Alert System**
+
   - If a student's mood rating is ≤ 3, the entry is flagged with `alert_flag=True`
   - Counsellors and wellbeing staff can view flagged logs in the `/alerts` route
   - Other roles cannot access `/tracker`; staff cannot log or view student logs
@@ -63,10 +64,15 @@ unisupport/
 │   ├── views.py          # Route handlers and business logic
 │   ├── forms.py          # WTForms for data validation
 │   ├── debug_utils.py    # Development utilities
-│   └── templates/        # Jinja2 templates
+│   ├── templates/        # Jinja2 templates
+│   ├── static/
+│   └── data/
 ├── tests/                # Test suite
 ├── requirements.txt      # Python dependencies
-└── README.md            # Project documentation
+├── run.py
+├── config.py
+├── .gitignore
+└── README.md             # Project documentation
 ```
 
 ## Setup and Installation
@@ -81,7 +87,13 @@ unisupport/
 2. **Initialize the database**
    You can initialize the database in two ways:
 
-   a. Using the Python shell:
+   a. Using the Flask CLI command:
+
+   ```bash
+   flask seed-db
+   ```
+
+   b. Using the Python shell:
 
    ```bash
    # Start Python shell
@@ -92,21 +104,13 @@ unisupport/
    >>> reset_db()
    ```
 
-   b. Using the debug route (after starting the server):
-
-   ```bash
-   # Start the server
-   flask run
-
-   # In your browser, visit:
-   http://localhost:5000/debug/reset-db
-   ```
-
    Both methods will:
 
    - Create all necessary database tables
    - Seed the database with test users for each role
    - Create an admin user (username: 'admin', password: 'admin123')
+
+   Note: The database is not automatically seeded on startup. You must explicitly run one of the above commands to initialize the database.
 
 3. **Run the development server**
    ```bash
@@ -155,20 +159,13 @@ Run the test suite:
 python -m pytest tests/
 ```
 
-## Contributing
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+## Team member contribution
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgments
-
-- Flask and SQLAlchemy communities
-- Bootstrap and Font Awesome for UI components
-- University mental health support teams for guidance
+| Student Name & ID  | Contribution (%) | Key Contributions / Tasks Completed    | Comments (if any) | Signature |
+| ------------------ | ---------------- | -------------------------------------- | ----------------- | --------- |
+| Vasiliki Ziaka     | 25%              | tracker, unit testing, video           |                   | VZ        |
+| Alexander Bond     | 25%              | referral, unit testing, video          |                   |           |
+| Nikki Evans        | 25%              | booking system, video                  |                   |           |
+| Elizabeth Tobin    | 25%              | core structure and setup, login, video |                   |           |
+| Joseph Liam Fisher | 0%               |                                        |                   |           |

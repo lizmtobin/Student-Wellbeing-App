@@ -85,13 +85,6 @@ def logout():
     logout_user()
     return redirect(url_for("home"))
 
-# Debug route to reset database - go to the url /debug/reset-db to reset the database
-@app.route("/debug/reset-db")
-def debug_reset_db():
-    reset_db()
-    flash("Database has been reset with test data.", "success")
-    return redirect(url_for("home"))
-
 
 @app.route("/referral_form", methods=["GET", "POST"])
 @login_required
