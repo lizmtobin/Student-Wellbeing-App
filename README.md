@@ -163,9 +163,9 @@ python -m pytest tests/
 ## Team member contribution
 
 | Student Name & ID  | Contribution (%) | Key Contributions / Tasks Completed    | Comments (if any) | Signature |
-| ------------------ | ---------------- | -------------------------------------- | ----------------- | --------- |
+| ------------------ | ---------------- |----------------------------------------| ----------------- |-----------|
 | Vasiliki Ziaka     | 25%              | tracker, unit testing, video           |                   | VZ        |
 | Alexander Bond     | 25%              | referral, unit testing, video          |                   |           |
-| Nikki Evans        | 25%              | booking system, video                  |                   |           |
+| Nikki Evans        | 25%              | booking system, unit testing, video    |                   | NE        |
 | Elizabeth Tobin    | 25%              | core structure and setup, login, video |                   |           |
 | Joseph Liam Fisher | 0%               |                                        |                   |           |

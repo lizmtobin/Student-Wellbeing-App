@@ -4,8 +4,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pytest
 from app import app, db
-from app.models import User, WellbeingLog
-
+from app.models import User, WellbeingLog, Appointment, Counsellor
+from datetime import datetime, timedelta
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
@@ -19,6 +19,21 @@ def client():
         user = User(username='student1', email='student1@example.com', type='student')
         user.set_password('password123')
         db.session.add(user)
+        db.session.commit()
+
+        counsellor = Counsellor(username='counsellor1', email='counsellor1@example.com')
+        counsellor.set_password('password123')
+        db.session.add(counsellor)
+        db.session.commit()
+
+        appointment = Appointment(
+            student_id=None,
+            counsellor_id=counsellor.id,
+            start_time=datetime.now() + timedelta(days=1),
+            end_time=datetime.now() + timedelta(days=1, hours=1),
+            status='Available'
+        )
+        db.session.add(appointment)
         db.session.commit()
 
     return app.test_client()
@@ -50,3 +65,40 @@ def test_log_wellbeing_negative(client):
     }, follow_redirects=True)
 
     assert b'Number must be between 1 and 10.' in response.data
+
+def test_book_appointment_positive(client):
+    """Test valid appointment booking"""
+    login(client)
+
+    with app.app_context():
+        appointment = Appointment.query.filter_by(status='Available').first()
+        assert appointment is not None
+
+
+    response = client.post(f'/confirm_appointment/{appointment.id}', data={
+        'reason': 'Need to talk'
+        }, follow_redirects=True)
+
+    assert b'Your appointment has been booked successfully' in response.data
+
+    with app.app_context():
+        updated = Appointment.query.get(appointment.id)
+        assert updated.status == 'Booked'
+        assert updated.student_id is not None
+
+
+def test_book_appointment_negative(client):
+    """Test invalid appointment booking (already booked)"""
+    login(client)
+    with app.app_context():
+        appointment = Appointment.query.filter_by(status='Available').first()
+        appointment.student_id = 1
+        appointment.status = 'Booked'
+        db.session.commit()
+        appointment_id = appointment.id
+
+    response = client.post(f'/confirm_appointment/{appointment_id}', data={
+        'reason': 'Trying again'
+    }, follow_redirects=True)
+
+    assert b'Sorry, this appointment has already been booked.' in response.data
