@@ -108,11 +108,10 @@ def referral_form():
         return redirect(url_for("view_referral"))
     form = ReferralForm()
     if form.validate_on_submit():
-        user_id = current_user.id
         student_id = current_user.student_id
         student_name = form.referral_name.data
         referral_info = form.referral_details.data
-        new_referral = CounsellingWaitlist(user_id=user_id, student_id=student_id, student_name=student_name, referral_info=referral_info)
+        new_referral = CounsellingWaitlist(student_id=student_id, student_name=student_name, referral_info=referral_info)
         db.session.add(new_referral)
         db.session.commit()
         #Above code adds new referral to the database using data submitted via the self-referral form.
@@ -124,7 +123,7 @@ def referral_form():
     return render_template(
         "referral_form.html", title="Counselling Self-Referral Form", form=form
     )
-
+#For wellbeing staff to view the whole waiting list
 @app.route("/view_waitlist")
 @login_required
 def view_waitlist():
@@ -137,16 +136,8 @@ def view_waitlist():
     referrals = CounsellingWaitlist.query.all()
     return render_template('waitlist.html', title="Counselling Waitlist", referrals=referrals)
 
-@app.route('/delete_referral/<int:student_id>', methods=['POST'])
-
-def delete_referral(student_id):
-    referral = CounsellingWaitlist.query.get_or_404(student_id)
-    db.session.delete(referral)
-    db.session.commit()
-    flash('Referral deleted successfully.', 'success')
-    return redirect(url_for('view_waitlist'))
-
-@app.route("/my_referral")
+#app.route for student users to view their own referral
+@app.route("/view_referral")
 @login_required
 def view_referral():
     if not isinstance(current_user, Student):
@@ -160,6 +151,22 @@ def view_referral():
         flash('No referral found for your account.', 'danger')
         return redirect(url_for('home'))
     return render_template('referral_detail.html', title='My Referral', referral=referral)
+
+@app.route('/edit_referral/<int:student_id>', methods=['GET', 'POST'])
+@login_required
+def edit_referral(student_id):
+    referral = CounsellingWaitlist.query.get_or_404(student_id)
+
+    if request.method == "POST":
+        # Update the referral_info from the form
+        new_info = request.form['referral_info']
+        referral.referral_info = new_info
+        db.session.commit()
+        flash("Referral information updated successfully!", "success")
+        return redirect(url_for('view_referral', student_id=student_id))
+
+    return render_template('edit_referral.html', title="Edit Referral", referral=referral)
+
 
 @app.route("/tracker", methods=["GET", "POST"])
 @login_required
