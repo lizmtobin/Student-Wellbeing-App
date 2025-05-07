@@ -81,6 +81,13 @@
                         <a class="nav-link" href="{{ url_for('view_appointment') }}">View Appointment Details</a>
                     </li>
                 {% endif %}
+                {% if current_user.is_authenticated and current_user.type == 'wellbeing_staff' %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('view_waitlist') }}">
+                        <i class="fas fa-list me-1"></i> View Counselling Waitlist
+                    </a>
+                </li>
+                {% endif %}
                 {% if current_user.type == 'counsellor' %}
                     <li>
                         <a class="nav-link" href="{{ url_for('counsellor_appointments') }}">View Appointments</a>

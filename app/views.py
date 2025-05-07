@@ -123,11 +123,11 @@ def referral_form():
     return render_template(
         "referral_form.html", title="Counselling Self-Referral Form", form=form
     )
-#For wellbeing staff to view the whole waiting list
+#For wellbeing staff to view the whole counselling waiting list and approve referrals
 @app.route("/view_waitlist")
 @login_required
 def view_waitlist():
-    if not isinstance(current_user, WellbeingStaff):
+    if current_user.type != 'wellbeing_staff':
         flash(
             "Only wellbeing-staff can view the counselling waiting list.",
             "danger",
@@ -136,7 +136,19 @@ def view_waitlist():
     referrals = CounsellingWaitlist.query.all()
     return render_template('waitlist.html', title="Counselling Waitlist", referrals=referrals)
 
-#app.route for student users to view their own referral
+@app.route('/approve_referral/<int:student_id>', methods=['POST'])
+@login_required
+def approve_referral(student_id):
+    if current_user.type != 'wellbeing_staff':
+        flash("Only wellbeing staff can approve referrals.", "danger")
+        return redirect(url_for('home'))
+    referral = CounsellingWaitlist.query.get_or_404(student_id)
+    db.session.delete(referral)
+    db.session.commit()
+    flash(f"Referral for {referral.student_name} has been approved and removed from the waitlist.", "success")
+    return redirect(url_for('view_waitlist'))
+
+#For student users to view and edit/delete their own referral
 @app.route("/view_referral")
 @login_required
 def view_referral():
@@ -146,7 +158,7 @@ def view_referral():
             "danger",
         )
         return redirect(url_for("home"))
-    referral = CounsellingWaitlist.query.filter_by(user_id=current_user.id).first()
+    referral = CounsellingWaitlist.query.filter_by(student_id=current_user.student_id).first()
     if referral is None:
         flash('No referral found for your account.', 'danger')
         return redirect(url_for('home'))
@@ -166,6 +178,17 @@ def edit_referral(student_id):
         return redirect(url_for('view_referral', student_id=student_id))
 
     return render_template('edit_referral.html', title="Edit Referral", referral=referral)
+
+@app.route("/delete_referral/<int:student_id>", methods=["POST"])
+@login_required
+def delete_referral(student_id):
+    referral = CounsellingWaitlist.query.get_or_404(student_id)
+    db.session.delete(referral)
+    db.session.commit()
+    flash("Referral deleted successfully!", "success")
+    return redirect(url_for('home'))
+
+
 
 
 @app.route("/tracker", methods=["GET", "POST"])
