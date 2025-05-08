@@ -11,7 +11,7 @@ A Flask-based web application designed to streamline access to mental health sup
 - **Wellbeing Staff**: Review and process referrals, assign to counsellors, generate reports
 - **Admins**: System configuration, user management, full access control
 
-### Core Functionality
+### Core Features
 
 - **Self-Referral System**
 
@@ -22,10 +22,14 @@ A Flask-based web application designed to streamline access to mental health sup
 
 - **Appointment Management**
 
-  - Online scheduling
-  - Calendar integration
-  - Reminder system
-  - Session notes and progress tracking
+  - Book Appointment: Students view and book available slots grouped by date.
+    Each slot shows time and counsellor.
+
+  - Confirm Appointment: After selecting a slot, students enter a reason to confirm the booking.
+    The system updates the slot status to “Booked.”
+
+  - Create Slot: Counsellors can add new appointment slots by specifying start/end time
+    and an optional note. These appear as bookable for students.
 
 - **Wellbeing Tracker**
 
@@ -38,7 +42,7 @@ A Flask-based web application designed to streamline access to mental health sup
   - Only shows when user has 2+ logs, otherwise helpful message is shown
   - Displays dates on the x-axis and mood levels on the y-axis
 
-- **Alert System**
+- **Alert System for Wellbeing Tracker**
 
   - If a student's mood rating is ≤ 3, the entry is flagged with `alert_flag=True`
   - Counsellors and wellbeing staff can view flagged logs in the `/alerts` route
@@ -66,12 +70,12 @@ unisupport/
 │   ├── debug_utils.py    # Development utilities
 │   ├── templates/        # Jinja2 templates
 │   ├── static/
-│   └── data/
+│   └── data/             # SQLite  database
 ├── tests/                # Test suite
 ├── requirements.txt      # Python dependencies
-├── run.py
+├── run.py                # Runs the whole app
 ├── config.py
-├── .gitignore
+├── .gitignore            # Files to ignore on commit
 └── README.md             # Project documentation
 ```
 
@@ -153,10 +157,18 @@ The application includes debug utilities for development:
 
 ### Testing
 
+The test_features.py file holds the tests for the 3 core features of the app (referral, booking system, wellbeing tracker).  
+There is one positive and one negative test for each.
+
 Run the test suite:
 
 ```bash
 python -m pytest tests/
+```
+
+ if pytest is already installed and accessible globally, you just run:
+```
+ pytest tests/
 ```
 
 ###DEVELOPEMENT NOTES
@@ -169,23 +181,10 @@ The application uses a polymorphic inheritance pattern for user management with 
   - Specialized models: `Student`, `Counsellor`, `WellbeingStaff`, and `Admin`
   - Each user type has specific attributes and relationships
 
-### Key Features
-1. **Role-Based Access Control**
+- **Role-Based Access Control**
    - Secure authentication system
    - Role-specific dashboards and functionalities
    - Protected routes and resources
-
-2. **Wellbeing Tracking**
-   - Mood logging system
-   - Symptom tracking
-   - Alert system for concerning entries
-   - Historical data analysis
-
-3. **Counselling Management**
-   - Appointment scheduling system
-   - Counsellor availability management
-   - Referral system with approval workflow
-   - Waitlist management
 
 ### Design Patterns
 - **Polymorphic Inheritance**: Used for user management to maintain clean separation of concerns
