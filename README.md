@@ -15,10 +15,11 @@ A Flask-based web application designed to streamline access to mental health sup
 
 - **Self-Referral System**
 
-  - Student-initiated counselling requests
-  - Priority-based processing
-  - Automated counsellor matching
-  - Status tracking and notifications
+  - Student users can self-refer for counselling via the referral form.
+  - Referrals are added to the counselling waitlist with date of submission for priority-based processing.
+  - Wellbeing Staff users can view and approve counselling referrals on the waiting list, and can view the referrals which have been approved. 
+  - Student users can also view, edit and delete their submitted referrals while on the waiting list.
+  - Once approved for counselling, student users can access the counselling appointment booking page.
 
 - **Appointment Management**
 
@@ -53,6 +54,7 @@ A Flask-based web application designed to streamline access to mental health sup
 - **Authentication**: Flask-Login with role-based access control
 - **Frontend**: Bootstrap 5, Font Awesome
 - **Templates**: Jinja2
+- **Testing**: Pytest
 
 ## Project Structure
 
@@ -165,7 +167,7 @@ python -m pytest tests/
 | Student Name & ID  | Contribution (%) | Key Contributions / Tasks Completed    | Comments (if any) | Signature |
 | ------------------ | ---------------- |----------------------------------------| ----------------- |-----------|
 | Vasiliki Ziaka     | 25%              | tracker, unit testing, video           |                   | VZ        |
-| Alexander Bond     | 25%              | referral, unit testing, video          |                   |           |
+| Alexander Bond     | 25%              | referral form, unit testing, video     |                   | AB        |
 | Nikki Evans        | 25%              | booking system, unit testing, video    |                   | NE        |
 | Elizabeth Tobin    | 25%              | core structure and setup, login, video |                   |           |
 | Joseph Liam Fisher | 0%               |                                        |                   |           |
