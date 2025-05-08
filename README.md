@@ -11,7 +11,7 @@ A Flask-based web application designed to streamline access to mental health sup
 - **Wellbeing Staff**: Review and process referrals, assign to counsellors, generate reports
 - **Admins**: System configuration, user management, full access control
 
-### Core Functionality
+### Core Features
 
 - **Self-Referral System**
 
@@ -23,10 +23,14 @@ A Flask-based web application designed to streamline access to mental health sup
 
 - **Appointment Management**
 
-  - Online scheduling
-  - Calendar integration
-  - Reminder system
-  - Session notes and progress tracking
+  - Book Appointment: Students view and book available slots grouped by date.
+    Each slot shows time and counsellor.
+
+  - Confirm Appointment: After selecting a slot, students enter a reason to confirm the booking.
+    The system updates the slot status to “Booked.”
+
+  - Create Slot: Counsellors can add new appointment slots by specifying start/end time
+    and an optional note. These appear as bookable for students.
 
 - **Wellbeing Tracker**
 
@@ -39,7 +43,7 @@ A Flask-based web application designed to streamline access to mental health sup
   - Only shows when user has 2+ logs, otherwise helpful message is shown
   - Displays dates on the x-axis and mood levels on the y-axis
 
-- **Alert System**
+- **Alert System for Wellbeing Tracker**
 
   - If a student's mood rating is ≤ 3, the entry is flagged with `alert_flag=True`
   - Counsellors and wellbeing staff can view flagged logs in the `/alerts` route
@@ -68,12 +72,12 @@ unisupport/
 │   ├── debug_utils.py    # Development utilities
 │   ├── templates/        # Jinja2 templates
 │   ├── static/
-│   └── data/
+│   └── data/             # SQLite  database
 ├── tests/                # Test suite
 ├── requirements.txt      # Python dependencies
-├── run.py
+├── run.py                # Runs the whole app
 ├── config.py
-├── .gitignore
+├── .gitignore            # Files to ignore on commit
 └── README.md             # Project documentation
 ```
 
@@ -98,11 +102,10 @@ unisupport/
    b. Using the Python shell:
 
    ```bash
-   # Start Python shell
-   python
+   # From the console start the shell 
+   flask shell
 
-   # In Python shell
-   >>> from app.debug_utils import reset_db
+   # In shell write:
    >>> reset_db()
    ```
 
@@ -111,6 +114,7 @@ unisupport/
    - Create all necessary database tables
    - Seed the database with test users for each role
    - Create an admin user (username: 'admin', password: 'admin123')
+   - As only Authorised Users can login, you will need to seed Users to test the App
 
    Note: The database is not automatically seeded on startup. You must explicitly run one of the above commands to initialize the database.
 
@@ -155,12 +159,52 @@ The application includes debug utilities for development:
 
 ### Testing
 
+The test_features.py file holds the tests for the 3 core features of the app (referral, booking system, wellbeing tracker).  
+There is one positive and one negative test for each.
+
 Run the test suite:
 
 ```bash
 python -m pytest tests/
 ```
 
+ if pytest is already installed and accessible globally, you just run:
+```
+ pytest tests/
+```
+
+###DEVELOPEMENT NOTES
+
+### Database Relationships
+The application uses a polymorphic inheritance pattern for user management with the following key relationships:
+
+- **User Hierarchy**:
+  - Base `User` model with polymorphic inheritance
+  - Specialized models: `Student`, `Counsellor`, `WellbeingStaff`, and `Admin`
+  - Each user type has specific attributes and relationships
+
+- **Role-Based Access Control**
+   - Secure authentication system
+   - Role-specific dashboards and functionalities
+   - Protected routes and resources
+
+### Design Patterns
+- **Polymorphic Inheritance**: Used for user management to maintain clean separation of concerns
+- **Repository Pattern**: Database operations are encapsulated within model classes
+- **Factory Pattern**: User creation and management
+- **MVC Architecture**: Clear separation of models, views, and controller(View for routing/decorators)
+
+### Development Methodology
+The project was developed using an iterative Agile approach:
+
+- **User Stories**: Feature development driven by user requirements as scoped out in Assignment1.
+- **Continuous Integration**: Regular code integration and collaboration via Teams & Github.
+- **Incremental Development**: Features added iteratively with regular feedback including acting as QA for eachothers work.
+
+### Future Iterations
+
+#### AI-Enhanced Features (Next Phase)
+The next iteration of UniSupport will incorporate AI capabilities to enhance the support system.
 
 ## Team member contribution
 
@@ -169,5 +213,6 @@ python -m pytest tests/
 | Vasiliki Ziaka     | 25%              | tracker, unit testing, video           |                   | VZ        |
 | Alexander Bond     | 25%              | referral form, unit testing, video     |                   | AB        |
 | Nikki Evans        | 25%              | booking system, unit testing, video    |                   | NE        |
-| Elizabeth Tobin    | 25%              | core structure and setup, login, video |                   |           |
+| Elizabeth Tobin    | 25%              | core structure and setup, login, video |                   | ET        |
 | Joseph Liam Fisher | 0%               |                                        |                   |           |
+

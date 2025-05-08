@@ -4,7 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import pytest
 from app import app, db
-from app.models import User, WellbeingLog, Appointment, Counsellor
+from app.models import User, WellbeingLog, Appointment, Counsellor, Student
 from datetime import datetime, timedelta
 @pytest.fixture
 def client():
@@ -15,17 +15,27 @@ def client():
     with app.app_context():
         db.drop_all()
         db.create_all()
-        #create test student user
-        user = User(username='student1', email='student1@example.com', type='student')
-        user.set_password('password123')
-        db.session.add(user)
+        
+        # Create student user directly as a Student instance
+        student = Student(
+            username='student1',
+            email='student1@example.com',
+            type='student',
+            student_id='12345',
+            course='Test Course',
+            year_of_study=1
+        )
+        student.set_password('password123')
+        db.session.add(student)
         db.session.commit()
 
+        # Create counsellor
         counsellor = Counsellor(username='counsellor1', email='counsellor1@example.com')
         counsellor.set_password('password123')
         db.session.add(counsellor)
         db.session.commit()
 
+        # Create test appointment
         appointment = Appointment(
             student_id=None,
             counsellor_id=counsellor.id,
@@ -82,23 +92,66 @@ def test_book_appointment_positive(client):
     assert b'Your appointment has been booked successfully' in response.data
 
     with app.app_context():
-        updated = Appointment.query.get(appointment.id)
+        updated = db.session.get(Appointment, appointment.id)
         assert updated.status == 'Booked'
         assert updated.student_id is not None
 
 
 def test_book_appointment_negative(client):
     """Test invalid appointment booking (already booked)"""
+    # Login as student
     login(client)
+    
     with app.app_context():
+        # Get the student user
+        student = User.query.filter_by(username='student1').first()
+        # Get an available appointment
         appointment = Appointment.query.filter_by(status='Available').first()
-        appointment.student_id = 1
+        # Mark it as booked by the student
+        appointment.student_id = student.id
         appointment.status = 'Booked'
         db.session.commit()
         appointment_id = appointment.id
 
+    # Try to book the already booked appointment
     response = client.post(f'/confirm_appointment/{appointment_id}', data={
         'reason': 'Trying again'
     }, follow_redirects=True)
 
     assert b'Sorry, this appointment has already been booked.' in response.data
+
+#positve test case for student accessing and submitting self-referral form
+def test_student_can_submit_referral(client):
+    # Login as student
+    client.post('/login', data={
+        'username': 'student1',
+        'password': 'password123',
+        'type': 'student'
+    }, follow_redirects=True)
+
+    # Submit the referral form
+    response = client.post('/referral_form', data={
+        'referral_name': 'Student One',
+        'referral_details': 'Anxiety',
+        'submit': 'Submit self-referral'
+    }, follow_redirects=True)
+
+    # Check for success message and proper status
+    assert response.status_code == 200
+    assert b"Counselling Self Referral Successfully Submitted" in response.data
+
+#negative test case for non-student (counsellor) attempting to access self-referral form.
+def test_non_student_cannot_access_referral_form(client):
+    # Login as counsellor
+    client.post('/login', data={
+        'username': 'counsellor1',
+        'password': 'password123',
+        'type': 'counsellor'
+    }, follow_redirects=True)
+
+    # Try to access referral form
+    response = client.get('/referral_form', follow_redirects=True)
+
+    # Check for access denial message
+    assert response.status_code == 200
+    assert b"Only students have access to the the counselling self-referral form." in response.data
